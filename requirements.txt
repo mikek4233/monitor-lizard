@@ -1,0 +1,4 @@
+pyshark
+psutil
+prettytable
+libnotify-bin
