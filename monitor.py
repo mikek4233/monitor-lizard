@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 import psutil
 import time
+import sys
 import re
 import os
 import pyshark
@@ -101,14 +103,26 @@ def monitor_network_requests():
                             for word in words:
                                 if word in site:
                                     send_notification(f"Alert!!! You are going to a bad site: {site}")
+                    elif len(pair) > 1:
+                        reg = re.compile('((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*')
+                        site = str(pair[1]).strip()
+                        if bool(reg.search(site)):
+                            print(site)
+                            for word in words:
+                                if word in site:
+                                    send_notification(f"Alert!!! You are going to a bad site: {site}")                    
+
         except AttributeError as e:
             # ignore packets other than TCP, UDP and IPv4
             pass
 
 
 def run_loop():
-    subprocess.run(["sudo", "pkill", "-9", "chrome"])
-    subprocess.Popen(["google-chrome", "https://github.com/mikek4233/monitor-lizard"])
+    if len(sys.argv) > 1 and sys.argv[1] == 'chrome-manual':
+        pass
+    else:
+        subprocess.run(["sudo", "pkill", "-9", "chrome"])
+        subprocess.Popen(["google-chrome", "https://github.com/mikek4233/monitor-lizard"])
     # Run an infinite loop to constantly monitor the system
     while True:
         # Clear the screen using a bash command
