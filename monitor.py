@@ -12,7 +12,6 @@ from badwords import words
 from datetime import datetime, timedelta
 from time import time
 import math
-from tabulate import tabulate
 
 HOME = os.path.expanduser("~")
 
@@ -77,25 +76,20 @@ def processes_info():
 
 def apps_info():
     process_list = {}
-    pretty_table = []
     for process in psutil.process_iter():
         with process.oneshot():
             create_time = datetime.fromtimestamp(process.create_time())
             create_time_str = create_time.strftime("%Y-%m-%d %H:%M:%S")
-            name = process.name()
-            status = process.status()
             duration = datetime.now() - create_time
             total_seconds = duration.total_seconds()
-            minutes = math.floor(total_seconds/60)
-            hours = math.floor(total_seconds/3600)
-            duration_str = str(hours)+":"+str(minutes)
-            process_list[name] = {'name': name, 'create_time': create_time_str, 'duration': duration_str, 'status': status}
-            if (status == 'running' and hours > 0):
-                send_notification("You spent too much time on: " + name)
+            minutes = str(math.floor(total_seconds/60))
+            hours = str(math.floor(total_seconds/3600))
+            duration_str = hours+":"+minutes
+            process_list[process.name()] = {'name': process.name(), 'create_time': create_time_str, 'duration': duration_str}
 
-    for key, value in process_list.items():
-        pretty_table.append([value['name'], value['status'], value['duration']])
-    print(tabulate(pretty_table, headers=['Name', 'Status', 'Duration'], tablefmt='orgtbl'))
+    dictionary_items = process_list.items()
+    for item in dictionary_items:
+        print(item)
 
 def send_notification(msg):
         Notify.init("Monitor Lizard")
