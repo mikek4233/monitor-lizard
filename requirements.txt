@@ -2,3 +2,4 @@ pyshark
 psutil
 prettytable
 libnotify-bin
+tabulate
