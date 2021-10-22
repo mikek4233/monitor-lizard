@@ -9,6 +9,9 @@ import subprocess
 from prettytable import PrettyTable
 from gi.repository import Notify
 from badwords import words
+from datetime import datetime, timedelta
+from time import time
+import math
 
 HOME = os.path.expanduser("~")
 
@@ -71,6 +74,23 @@ def processes_info():
             pass
     return(process_table)
 
+def apps_info():
+    process_list = {}
+    for process in psutil.process_iter():
+        with process.oneshot():
+            create_time = datetime.fromtimestamp(process.create_time())
+            create_time_str = create_time.strftime("%Y-%m-%d %H:%M:%S")
+            duration = datetime.now() - create_time
+            total_seconds = duration.total_seconds()
+            minutes = str(math.floor(total_seconds/60))
+            hours = str(math.floor(total_seconds/3600))
+            duration_str = hours+":"+minutes
+            process_list[process.name()] = {'name': process.name(), 'create_time': create_time_str, 'duration': duration_str}
+
+    dictionary_items = process_list.items()
+    for item in dictionary_items:
+        print(item)
+
 def send_notification(msg):
         Notify.init("Monitor Lizard")
         Notify.Notification.new(msg).show()
@@ -118,6 +138,8 @@ def monitor_network_requests():
 
 
 def run_loop():
+    apps_info()
+    return
     if len(sys.argv) > 1 and sys.argv[1] == 'chrome-manual':
         pass
     else:
@@ -145,6 +167,8 @@ def run_loop():
         # Fetch the last 10 processes from available processes
         print("\n----Processes----")
         print(processes_info())
+
+        # List all the pgms with create time and how long it's been running
 
         print("\n----Network Requests----")
         monitor_network_requests()
