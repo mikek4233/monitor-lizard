@@ -5,7 +5,6 @@ words = [
     'acrotomophilia',
     'alabama hot pocket',
     'alaskan pipeline',
-    'anal',
     'anilingus',
     'anus',
     'apeshit',
