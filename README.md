@@ -3,12 +3,16 @@ A easy system to monitor all activity on a linux device
 
 Run ./setup.sh 
 
-Run python3 monitor.py
+Run sudo python3 monitor.py
+
+## Args
+- keylogger | Activates the key logger | Ex. sudo python3 monitor.py keylogger
+- chrome-manual | Allows you to ru chrome from your terminal. See options section below | Ex. sudo python3 monitor.py chrome-manual
 
 ## Options:
 To run chrome from a separate terminal tab (this way when you end the program chrome wont close) run monitor.py chrome-manual and start chrome from a separete terminal tab
 
-To run as a background process run nohup python3 -u ~/{insert path to program}/monitor.py chrome-manual > output.log &
+To run as a background process run nohup python3 -u ~/{insert path to program}/monitor.py chrome-manual keylogger > output.log &
 
 Note: You must launch chrome from your terminal for the monitor to pick up your traffic.
 

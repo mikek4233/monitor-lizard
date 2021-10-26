@@ -3,3 +3,4 @@ psutil
 prettytable
 libnotify-bin
 tabulate
+pyxhook
