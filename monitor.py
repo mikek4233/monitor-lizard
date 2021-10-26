@@ -195,6 +195,31 @@ class MonitorLizzard:
             except (Exception) as _:
                 # ignore packets other than TCP, UDP and IPv4
                 pass
+    
+    def temp_info(self):
+        temp_table = PrettyTable(["Hardware", "Temp"])
+        temp = subprocess.Popen(["sensors | grep Package"], shell=True, universal_newlines=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        (c_temp, stderr) = temp.communicate()
+
+        chip_temp = c_temp.split(':')[1].split('C')[0].replace('+', '').replace('°', '').strip()
+
+        temp_table.add_row(["Chip", chip_temp + '°f'])
+
+        if float(chip_temp) > 175:
+            self.send_notification(f"Warning - Chip overheating at {chip_temp}°f")
+
+        display = subprocess.Popen(["sudo -S hddtemp -n SATA:/dev/sda"], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        (d_temp, stderr) = display.communicate()
+
+        drive_temp = d_temp.decode('utf-8', errors='ignore').strip() 
+
+        temp_table.add_row(["Hard drive", drive_temp + '°f'])
+
+        if float(drive_temp) > 120:
+            self.send_notification(f"Warning - Hard drive overheating at {drive_temp}°f")
+
+        return(temp_table)
+        
 
     def run_loop(self):
         if len(sys.argv) > 1 and sys.argv[1] == 'chrome-manual':
@@ -213,8 +238,11 @@ class MonitorLizzard:
             # Fetch the battery information
             print(self.battery_info())
 
+            print("\n----Hardware Info----")
+            print(self.temp_info())
+
             # Fetch the Network information
-            print("----Networks----")
+            print("\n----Networks----")
             print(self.network_info())
 
             # Fetch the memory information
@@ -232,7 +260,7 @@ class MonitorLizzard:
             self.monitor_network_requests()
         
             # Create a 1 second delay
-            # time.sleep(1)
+            time.sleep(1)
 
 
 if __name__ == "__main__":
