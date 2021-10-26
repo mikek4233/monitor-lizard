@@ -5,6 +5,7 @@ import sys
 import re
 import os
 import pyshark
+import pyxhook
 import subprocess
 from prettytable import PrettyTable
 from gi.repository import Notify
@@ -12,10 +13,13 @@ from badwords import words
 from datetime import datetime
 import math
 from tabulate import tabulate
+from key_logger import run_key_logger
 
 class MonitorLizzard:
 
     def __init__(self):
+        self.args = sys.argv[1:]
+        print(self.args)
         self.home = os.path.expanduser("~")
         self.interface_count = 0
         self.networks = {}
@@ -219,15 +223,17 @@ class MonitorLizzard:
             self.send_notification(f"Warning - Hard drive overheating at {drive_temp}°f")
 
         return(temp_table)
-        
 
     def run_loop(self):
-        if len(sys.argv) > 1 and sys.argv[1] == 'chrome-manual':
+        if 'chrome-manual' in self.args:
             pass
         else:
             subprocess.run(["sudo", "pkill", "-9", "chrome"])
             subprocess.Popen(["google-chrome", "https://github.com/mikek4233/monitor-lizard"])
         # Run an infinite loop to constantly monitor the system
+        if "keylogger" in self.args:
+            subprocess.run(["xhost", "+"])
+            run_key_logger()
         while True:
             # Clear the screen using a bash command
             subprocess.run(["clear"])
@@ -267,4 +273,3 @@ if __name__ == "__main__":
     monitor = MonitorLizzard()
     monitor.handle_key_log_file()
     monitor.run_loop()
-
